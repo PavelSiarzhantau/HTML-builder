@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-function copyDir() {
+function copyDir(){
   createDir();
   fs.readdir(
     path.join(__dirname, 'files'),
