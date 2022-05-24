@@ -3,6 +3,7 @@ const path = require('path');
 
 function copyDir(){
   createDir();
+  deleteAssets();
   fs.readdir(
     path.join(__dirname, 'files'),
     { withFileTypes: false },
@@ -24,9 +25,21 @@ function copyDir(){
 function createDir() {
   fs.mkdir(path.join(__dirname, 'files-copy'), { recursive: true }, (err) => {
     if (err) {
-      return console.error(err);
+      console.error(err);
     }
     console.log('Directory created successfully!');
+  });
+}
+function deleteAssets(){
+  fs.readdir(path.join(__dirname, 'files-copy'),{withFileTypes:true}, (err, files)=>{
+    if(err) console.error(err.message);
+    files.forEach(file=>{
+      if(file.isFile()){
+        fs.unlink(path.join(__dirname, `files-copy/${file.name}`),(err)=>{
+          if(err) console.log(err.message);
+        });
+      }
+    });
   });
 }
 copyDir();
