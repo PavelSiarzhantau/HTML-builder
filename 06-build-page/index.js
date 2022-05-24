@@ -143,17 +143,10 @@ createDir.then(fs.readdirAsync(path.join(__dirname, '/components/'))
         filenames = filenames.filter(isFileCss);
         return Promise.all(((filenames.map(getFileCss))));
       }).then(files=>{
-        let mapCss= new Map(files);
         fs.writeFile(path.join(__dirname,'/project-dist/style.css'),'',err=>{if(err) console.error(err);});
-        for(let i = 0; i< mapCss.size;i++){
-          if(i === 0){
-            fs.appendFile(path.join(__dirname,'/project-dist/style.css'),mapCss.get('header'),err=>{if(err) console.error(err);});
-          }else if(i === 1){
-            fs.appendFile(path.join(__dirname,'/project-dist/style.css'),mapCss.get('main'),err=>{if(err) console.error(err);});
-          }else if(i===2){
-            fs.appendFile(path.join(__dirname,'/project-dist/style.css'),mapCss.get('footer'),err=>{if(err) console.error(err);});
-          }
-        }
+        files.forEach((e)=>{
+          fs.appendFile(path.join(__dirname,'/project-dist/style.css'),e.toString(),err=>{if(err) console.error(err);});
+        });
         return new Promise(res=>res());
       }).then(()=>{
         deleteAssets('/project-dist/assets');
