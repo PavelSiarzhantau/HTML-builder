@@ -8,6 +8,12 @@ const readline = rl.createInterface({
 });
 let dataToAdd = '';
 
+function createTxt(){
+  fs.appendFile(path.join(__dirname,'test.txt'),'', (err)=>{
+    if(err) console.error(err.message);
+  });
+}
+
 function createWriteStream() {
   return fs.createWriteStream(path.join(__dirname, 'test.txt'));
 }
@@ -27,6 +33,7 @@ fs.access(path.join(__dirname, 'test.txt'), (error) => {
 });
 
 function createMainLogic(readStream) {
+  createTxt();
   sayHi();
   readStream.on('data', (chunk) => {
     dataToAdd += chunk;
