@@ -59,25 +59,6 @@ let copyAssets = (dirname)=>{
   });
 };
 
-//css helpers
-fs.readdirAsyncCss = (dirname)=>{
-  return new Promise((resolve,reject)=>{
-    fs.readdir(dirname,{withFileTypes:true},(err,filenames)=>{
-      if(err) reject(err);
-      else resolve(filenames);
-    });
-  });
-};
-function isFileCss(file) {
-  return path.extname(file.name) === '.css' && file.isFile();
-}
-function getFileCss(file) {
-  let text = fsPromises.readFile(path.join(__dirname, `/styles/${file.name}`),'utf-8');
-  return text.then(data=>{
-    return [path.parse(file.name).name, data];
-  });
-
-}
 //html helpers
 let createDir = fsPromises.mkdir(path.join(__dirname,'project-dist'),{recursive:true});
 fs.readdirAsync = (dirname) => {
@@ -138,21 +119,21 @@ createDir.then(fs.readdirAsync(path.join(__dirname, '/components/'))
     return new Promise((res)=>res());
   //css
   }).then(()=>{
-    fs.readdirAsyncCss(path.join(__dirname, '/styles/'))
-      .then((filenames)=>{
-        filenames = filenames.filter(isFileCss);
-        return Promise.all(((filenames.map(getFileCss))));
-      }).then(files=>{
-        fs.writeFile(path.join(__dirname,'/project-dist/style.css'),'',err=>{if(err) console.error(err);});
-        files.forEach((e)=>{
-          fs.appendFile(path.join(__dirname,'/project-dist/style.css'),e.toString(),err=>{if(err) console.error(err);});
-        });
-        return new Promise(res=>res());
-      }).then(()=>{
-        deleteAssets('/project-dist/assets');
-        copyAssets('assets');
+    fs.readdir(path.join(__dirname,'/styles'), { withFileTypes: true }, (err, files) => {
+      const output = fs.createWriteStream(path.join(__dirname, '/project-dist/style.css'));
+      files.forEach(file => {
+        if (file.isFile()) {
+          const stream = fs.createReadStream(path.join(__dirname,'/styles', file.name));
+          stream.pipe(output, { end: false });
+        }
       });
+    });
+    return new Promise(res=>res());
+  }).then(()=>{
+    deleteAssets('/project-dist/assets');
+    copyAssets('assets');
   }));
+  
 
 
 
